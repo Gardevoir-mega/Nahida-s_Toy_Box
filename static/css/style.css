@@ -9,7 +9,7 @@
 }
 
 body {
-    background-color: #9d88d3;
+    background-color: #CCDEAD;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Adjusted", "Segoe UI", "Liberation Sans", 'Roboto', sans-serif;
     font-size: 1.5em;
     color: white;
@@ -32,7 +32,7 @@ body {
 }
 
 #wrapper-background-filter {
-    background-color: #9d88d3f5;
+    background-color: #CCDEADF5;
     position: absolute;
     width: 100%;
     height: 100%;
@@ -101,25 +101,24 @@ h2 {
 }
 
 #counter-container>p {
-    text-shadow: #9d88d3 0 0 10px, #9d88d3 0 0 10px, #9d88d3 0 0 10px, #9d88d3 0 0 10px, #9d88d3 0 0 10px;
+    text-shadow: #CCDEAD 0 0 10px, #CCDEAD 0 0 10px, #CCDEAD 0 0 10px, #CCDEAD 0 0 10px, #CCDEAD 0 0 10px;
 }
 
 #global-counter {
-    color: #574f84;
+    color: #9AA38B70;
     font-size: 2em;
     line-height: 38px;
 }
 
 #local-counter {
-    color: #574f84;
+    color: #9AA38B70;
     /* font-size: 0.75em; */
     font-size: 2em;
 }
 
 #counter-button {
     visibility: hidden;
-    background-color: #574f84;
-    border: none;
+    background: linear-gradient(#9AA38B70, #A7B79270);
     border-radius: 16px;
     color: white;
     padding: 16px 32px;
@@ -128,6 +127,8 @@ h2 {
     font-family: 'Roboto', sans-serif;
     font-weight: bold;
     margin-top: 16px;
+    border: solid 2px #50645070;
+    outline: solid 2px #E6E6D270;
 
     position: relative;
     overflow: hidden;
@@ -137,7 +138,7 @@ h2 {
 }
 
 #counter-button:hover {
-    background-color: #2d2463;
+    background-color: #506450;
 }
 
 #counter-button:active {
