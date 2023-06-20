@@ -1,30 +1,25 @@
-﻿## Warning
-The counter has paused, awaiting additional remediation measures, as a result of the excessive traffic and malicious flood of requests.
+﻿## 施工中
+先挖个坑，什么时候填就真不知道了
 
-<div align="center"><img src="static/img/hertaa_github.gif"></div>
+<div align="center">
+<p>献给原神最可爱的执行官纳西妲酱</p>
+<p>The website for Nahida, the cutest Archon Genshin Impact character out there!</p>
+</div>
 
-<div align="center"><p>The website for Herta, the cutest genius Honkai: Star Rail character out there!</p>
-<p>献给崩坏：星穹铁道最可爱的天才黑塔酱</p></div>
+# Nahida's "Toy Box" | 纳西妲的「玩具箱」
 
-  [![Chat on Discord](https://img.shields.io/badge/chat-discord-blue?style=flat&logo=discord)](https://discord.gg/yzkEz6xxdM)
-
-# Herta Kuru | 黑塔转圈圈 | ヘルタクルへ
-[Home Page | 主页 | ホーム ページ (Render)](https://herta.onrender.com)
-
-Herta GIF and art made by | 黑塔 GIF 绘画者 : [@Seseren_kr](https://twitter.com/Seseren_kr) 
-
-The art the relevant copyright of Honkai: Star Rail belongs to miHoYo/HoYoverse.
+The art the relevant copyright of Genshin Impact belongs to miHoYo/HoYoverse.
 
 角色版权归米哈游所有。
+
 ***
-
-## Credits
-### Contributers | 贡献者
-
-<a href="https://github.com/duiqt/herta_kuru/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=duiqt/herta_kuru" />
-</a>
 
 ### Original Inspration
 
-Thanks KawaiiShadowii and his website [tannhauser.moe](https://tannhauser.moe), where our inspirations and the super-original code from. ([#44](https://github.com/duiqt/herta_kuru/issues/44))
+感谢duiqt和他的网站[herta.onrender.com](https://herta.onrender.com/)
+
+Thanks duiqt and his website [herta.onrender.com](https://herta.onrender.com/)
+
+感谢KawaiiShadowii和他的网站[tannhauser.moe](https://tannhauser.moe)
+
+Thanks KawaiiShadowii and his website [tannhauser.moe](https://tannhauser.moe)
