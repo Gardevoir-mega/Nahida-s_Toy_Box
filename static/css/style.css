@@ -5,7 +5,17 @@
     -ms-touch-action: manipulation;
     touch-action: manipulation;
     /* strange margin-right occurs when vw<500px */
-    /* overflow-x: hidden; */
+    /* overflow-x: hidden;*/
+    /* 禁用右键和选中 */
+    -webkit-user-select: none;
+    /* Chrome, Safari, Opera */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* Internet Explorer/Edge */
+    user-select: none;
+    /* iOS Safari */
+    -webkit-touch-callout: none;
 }
 
 body {
@@ -13,11 +23,21 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Adjusted", "Segoe UI", "Liberation Sans", 'Roboto', sans-serif;
     font-size: 1.5em;
     color: white;
-    overflow-x: hidden;
+    /*overflow-x: hidden;*/
+    /*width: 100vw;*/
+    height: 100vh;
+    overflow: scroll;
+    scroll-snap-type: y mandatory;
 }
-
+section {
+    width: 100vw;
+    height: 100vh;
+    min-height: 480px; /* 最小高度为480px */
+    scroll-snap-align: start;
+}
 .wrapper {
-    position: relative;
+    /*margin: 2vh auto;*/
+    /*position: relative;*/
 }
 
 #wrapper-background {
@@ -172,45 +192,33 @@ h2 {
 }
 
 #footer {
-    background-color: white;
+    background-color: pink;
     color: black;
-    padding: 16px 10vw;
+    /*padding: 16px 10vw;*/
+    padding: 10vw;
     display: flex;
     gap: 30px;
     align-items: center;
     justify-content: center;
+    height: 100vh; /* 占据整个视口 */
+    min-height: 480px; /* 最小高度为480px */
 }
 
-#herta-card {
+#nahida-card {
     min-width: 256px;
     max-width: 720px;
     height: auto;
-    border-top-left-radius: 2% 3.5%;
-    border-top-right-radius: 2% 3.5%;
-    border-bottom-left-radius: 2% 3.5%;
-    border-bottom-right-radius: 2% 3.5%;
 }
 
-/* test,由vgwik添加 */
-#herta-card:hover {
-    background-color: #ececec;
-    transform: translate3d(-0.5px, -0.5px, 0px);
+#nahida-card:hover {
+    transform: translate3d(-3.5px, -3.5px, 0px);
     transition: transform 0.3s ease;
-    box-shadow: 2px 0.9px 2.5px 0.5px #00000042;
 }
 
 .footer-icon {
     display: inline-block;
     vertical-align: middle;
     font-size: 2em;
-}
-
-#twitter-footer-icon {
-    color: #1d9bf0;
-}
-
-#github-footer-icon {
-    color: #000000;
 }
 
 .footer-icon-text {
@@ -319,31 +327,6 @@ h2 {
     }
 }
 
-#access-via-mirror,
-#access-via-pages {
-    font-size: small;
-}
-
-#credits-part {
-    width: 100%;
-}
-
-.credits-head-img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-}
-
 .about-link {
     color: black !important;
-}
-
-.mdlist-ava-fix {
-    overflow: hidden !important;
-}
-
-.mdlist-ava-fix img {
-    /* position: absolute; */
-    top: 0px;
-    left: 0px;
 }
