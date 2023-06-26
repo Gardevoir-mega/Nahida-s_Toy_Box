@@ -3,11 +3,8 @@ var LANGUAGES = {
 //TODO:语言支持
     "cn": {
         audioList: [
-            "audio/cn/gululu.mp3",
-            "audio/cn/gururu.mp3",
-            "audio/cn/转圈圈.mp3",
-            "audio/cn/转圈圈咯.mp3",
-            "audio/cn/要坏掉了.mp3"
+            "static/audio/cn/nana-1.aac",
+            "static/audio/cn/nana-2.aac",
         ],
         texts: {
             "page-title": "欢迎来到纳西妲的「玩具箱」",
@@ -44,12 +41,37 @@ var LANGUAGES = {
 };
 
 (() => {
+    multiLangMutation() // 页面加载时，初始化语言
+    // 缓存gif
+    cacheStaticObj("img/nahida-2.gif");
+    cacheStaticObj("img/nahida-3.gif");
+    cacheStaticObj("img/nahida-4.gif");
+    cacheStaticObj("img/nahida-5.gif");
+
+    // 获取全局计数器元素并初始化其相应的计数。
+    const localCounter = document.querySelector('#local-counter');
+    let localCount = localStorage.getItem('count-v2') || 0;
+
+    // 数字使用美式英语格式，重新格式化计数器
+    localCounter.textContent = localCount.toLocaleString('en-US');
+
+    // 初始化计时器变量并为计数器按钮元素添加事件监听器。
+    const counterButton = document.querySelector('#counter-button');
+    counterButton.addEventListener('click', (e) => {
+        localCount++;
+        localCounter.textContent = localCount.toLocaleString('en-US');
+        triggerRipple(e);
+        playNana();
+        animateHerta();
+        refreshDynamicTexts();
+    });
+
     const $ = mdui.$;
 
-    // initialize cachedObjects variable to store cached object URLs
+    // 初始化cachedObjects变量以存储缓存的对象URL
     var cachedObjects = {};
 
-    // function to try caching an object URL and return it if present in cache or else fetch it and cache it
+    // 缓存对象URL，缓存中存在则返回缓存，如果不存在则获取并缓存它
     function cacheStaticObj(origUrl) {
         if (cachedObjects[origUrl]) {
             return cachedObjects[origUrl];
@@ -67,80 +89,58 @@ var LANGUAGES = {
             }, 1);
             return origUrl;
         }
-    };
+    }
 
-    let firstSquish = true;
+    //是否是第一次播放
+    let firstNana = true;
 
-    // This code tries to retrieve the saved language 'lang' from localStorage. If it is not found or if its value is null, then it defaults to "en". 
-    var current_language = localStorage.getItem("lang") || LANGUAGES._.defaultLanguage;
-    var current_vo_language = localStorage.getItem("volang") || LANGUAGES._.defaultVOLanguage;
+    // 从localStorage检索保存的语言“lang”。如果未找到或其值为null，则默认为“cn”。
+    let current_language = localStorage.getItem("lang") || LANGUAGES._.defaultLanguage;
+    let current_vo_language = localStorage.getItem("volang") || LANGUAGES._.defaultVOLanguage;
 
     // function that takes a textId, optional language and whether to use fallback/ default language for translation. It returns the translated text in the given language or if it cannot find the translation, in the default fallback language.
+    //一个函数，接收textId、可选的语言和是否使用回退/默认语言进行翻译作为参数。它返回给定语言下的翻译文本，如果找不到翻译，则返回默认回退语言下的翻译文本。
     function getLocalText(textId, language = null, fallback = true) {
         let curLang = LANGUAGES[language || current_language];
         let localTexts = curLang.texts;
         if (localTexts[textId] != undefined) {
             let value = localTexts[textId];
             if (value instanceof Array) {
-                return randomChoice(value); // if there are multiple translations available for this text id, it randomly selects one of them and returns it.
+                return randomChoice(value); // 如果该文本ID有多个可用的翻译，则随机选择其中一个并返回。
             } else {
                 return value;
             }
         }
-        if (fallback) return getLocalText(textId, language = "en", fallback = false);
+        if (fallback) return getLocalText(textId, language = "cn", fallback = false);
         else return null;
     }
 
-    // function that updates all the relevant text elements with the translations in the chosen language.
+    // 切换语言时更新相关文本元素
     function multiLangMutation() {
         let curLang = LANGUAGES[current_language];
         let localTexts = curLang.texts;
         Object.entries(localTexts).forEach(([textId, value]) => {
             if (!(value instanceof Array))
-                if (document.getElementById(textId) != undefined)
-                    document.getElementById(textId).innerHTML = value; // replaces the innerHTML of the element with the given textId with its translated version.
+                if (document.getElementById(textId) !== undefined)
+                    document.getElementById(textId).innerHTML = value; // 将元素的innerHTML替换为给定的textId及其翻译版本。
         });
         refreshDynamicTexts()
-        document.getElementById("herta-card").src = "static/" + curLang.cardImage; // sets the image of element with id "herta-card" to the translated version in the selected language.
+        document.getElementById("herta-card").src = "static/" + curLang.cardImage; // 将具有id "herta-card"的元素的图像设置为所选语言中的翻译版本
     };
 
-    multiLangMutation() // the function multiLangMutation is called initially when the page loads.
-
-    // function that returns the list of audio files for the selected language
+    // 获取所选语言对应的音频地址
     function getLocalAudioList() {
         return LANGUAGES[current_vo_language].audioList;
     }
 
-    // get global counter element and initialize its respective counts
-    const localCounter = document.querySelector('#local-counter');
-    let localCount = localStorage.getItem('count-v2') || 0;
-
-    // display counter
-    localCounter.textContent = localCount.toLocaleString('en-US');
-
-    // initialize timer variable and add event listener to the counter button element
-    const counterButton = document.querySelector('#counter-button');
-    counterButton.addEventListener('click', (e) => {
-        localCount++;
-        localCounter.textContent = localCount.toLocaleString('en-US');
-        triggerRipple(e);
-        playKuru();
-        animateHerta();
-        refreshDynamicTexts();
-    });
-
-    // try caching the hertaa1.gif and hertaa2.gif images by calling the tryCacheUrl function
-    cacheStaticObj("img/hertaa1.gif");
-    cacheStaticObj("img/hertaa2.gif");
-
-    // Define a function that takes an array as an argument and returns a random item from the array
+    // 接收一个数组作为参数并返回该数组中的随机元素
     function randomChoice(myArr) {
         const randomIndex = Math.floor(Math.random() * myArr.length);
         const randomItem = myArr[randomIndex];
         return randomItem;
     }
 
-    // Define a function that shuffles the items in an array randomly using Fisher-Yates algorithm
+    // 使用费雪耶茨算法(Fisher-Yates shuffle)随机洗牌数组中元素
     function randomShuffle(myArr) {
         for (let i = myArr.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -159,10 +159,10 @@ var LANGUAGES = {
         return localAudioList[randomIndex];
     }
 
-    function playKuru() {
+    function playNana() {
         let audioUrl;
-        if (firstSquish) {
-            firstSquish = false;
+        if (firstNana) {
+            firstNana = false;
             audioUrl = getLocalAudioList()[0];
         } else {
             audioUrl = getRandomAudioUrl();
@@ -177,9 +177,9 @@ var LANGUAGES = {
 
     function animateHerta() {
         let id = null;
-        const random = Math.floor(Math.random() * 2) + 1;
+        const random = randomNum(1,5);
         const elem = document.createElement("img");
-        elem.src = cacheStaticObj(`img/hertaa${random}.gif`);
+        elem.src = cacheStaticObj(`img/nahida-${random}.gif`);
         elem.style.position = "absolute";
         elem.style.right = "-500px";
         elem.style.top = counterButton.getClientRects()[0].bottom + scrollY - 430 + "px"
@@ -198,8 +198,11 @@ var LANGUAGES = {
                 elem.style.right = pos + 'px';
             }
         }, 12);
-    };
+    }
 
+    function randomNum(min, max){
+        return Math.floor(Math.random()*(max-min+1))+min;
+    }
     // This function creates ripples on a button click and removes it after 300ms.
     function triggerRipple(e) {
         let ripple = document.createElement("span");
