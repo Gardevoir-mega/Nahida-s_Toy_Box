@@ -28,6 +28,7 @@ const LANGUAGES = {
 };
 
 (() => {
+    const $ = mdui.$;
     // 初始化cachedObjects变量以存储缓存的对象URL
     const cachedObjects = {};
 
@@ -40,16 +41,19 @@ const LANGUAGES = {
 
     // 获取全局计数器元素并初始化其相应的计数。
     const localCounter = document.querySelector('#local-counter');
-    let localCount = localStorage.getItem('count-v2') || 0;
-
-    // 数字使用美式英语格式，重新格式化计数器
-    localCounter.textContent = localCount.toLocaleString('en-US');
-
+    let localCount = localStorage.getItem('count-nahida') || 0;
+    let lastCount = 0;
+    let tempCount = 0;
+    let akashaTerminalCount = 0;
+    let akashaTerminalRun = false;
+    //初始化计数器
+    initCounter();
     // 初始化计时器变量并为计数器按钮元素添加事件监听器。
     const counterButton = document.querySelector('#counter-button');
     counterButton.addEventListener('click', (e) => {
         localCount++;
-        localCounter.textContent = localCount.toLocaleString('en-US');
+        lastCount++;
+        updateCounter();
         triggerRipple(e);
         playNana();
         animateNahida();
@@ -100,6 +104,21 @@ const LANGUAGES = {
      */
     function isMobile() {
         return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    /**
+     * 初始化计数器（尝试从本地存储中加载历史计数）
+     */
+    function initCounter() {
+        // 数字使用美式英语格式，重新格式化计数器
+        localCounter.textContent = localCount.toLocaleString('en-US');
+    }
+
+    /**
+     * 更新计数器
+     */
+    function updateCounter() {
+        // 数字使用美式英语格式，重新格式化计数器
+        localCounter.textContent = (akashaTerminalCount+lastCount+tempCount).toLocaleString('en-US');
     }
 
     // function that takes a textId, optional language and whether to use fallback/ default language for translation. It returns the translated text in the given language or if it cannot find the translation, in the default fallback language.
@@ -171,7 +190,6 @@ const LANGUAGES = {
         const screenWidth = window.innerWidth;
         console.log(screenWidth, (counterButton.getClientRects()[0].bottom + scrollY), isMobile())
         if (isMobile()) {
-            //移动端，把动画变小、变慢一点
             elem.style.position = "absolute";
             elem.style.right = "-200px";
             elem.style.top = counterButton.getClientRects()[0].bottom + scrollY - 150 + "px"
@@ -197,8 +215,8 @@ const LANGUAGES = {
             elem.style.right = "-500px";
             elem.style.top = counterButton.getClientRects()[0].bottom + scrollY - 230 + "px"
             elem.style.zIndex = "-10";
-            elem.style.width = "300px"; // 设置宽度为 500px
-            elem.style.height = "auto"; // 自动计算高度，保持纵横比
+            elem.style.width = "300px";
+            elem.style.height = "auto";
             document.body.appendChild(elem);
 
             let pos = -500;
@@ -248,4 +266,39 @@ const LANGUAGES = {
         });
     }
 
-})(); 
+    function fromAkashaTerminal(){
+        if(akashaTerminalRun){
+           return; 
+        }
+        const start = new Date().getTime();
+        akashaTerminalRun = true;
+        tempCount = lastCount;
+        lastCount = 0;
+        $.ajax({
+            method: 'GET',
+            url: 'https://akasha.lv6.fun/terminal/nahida/toy/box/count',
+            data: {
+                num: tempCount
+            },
+            success: function (data) {
+                const nums = JSON.parse(data);
+                akashaTerminalCount = nums.n;
+                tempCount = 0;
+                updateCounter();
+            },
+            complete: function (xhr, textStatus) {
+                console.log("time: " + new Date() + " " + (new Date().getTime() - start));
+                akashaTerminalRun = false;
+            }
+        });
+    }
+
+    window.onload = () => {
+        setInterval(() => {
+            localStorage.setItem('count-nahida', localCount);
+        }, 500);
+        setInterval(() => {
+            fromAkashaTerminal();
+        }, 5000);
+    };
+})();

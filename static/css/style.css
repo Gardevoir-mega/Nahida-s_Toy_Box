@@ -111,7 +111,7 @@ h2 {
 }
 
 #counter-container>p {
-    text-shadow: #E8FFC3AD 0 0 10px, #E8FFC3AD 0 0 10px, #E8FFC3AD 0 0 10px, #E8FFC3AD 0 0 10px, #E8FFC3AD 0 0 10px;
+    text-shadow: #E8FFC3AD 0 0 30px, #E8FFC3AD 0 0 10px, #E8FFC3AD 0 0 10px, #E8FFC3AD 0 0 10px, #E8FFC3AD 0 0 10px;
 }
 
 /*本地计数器*/
