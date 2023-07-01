@@ -29,7 +29,6 @@ body {
     background-color: #CCDEAD;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Adjusted", "Segoe UI", "Liberation Sans", 'Roboto', sans-serif;
     font-size: 2em;
-    color: white;
     overflow: hidden;
 }
 /*贴合滚动*/
@@ -62,7 +61,13 @@ h2 {
 #footer{
     background-color: rgb(245,243,232);
 }
-
+#terminal-logo {
+    position:absolute;
+    left:5px;
+    top:5px;
+    width: 20px;
+    height: auto;
+}
 /*第一页*/
 #content {
     margin: 10vh auto;
@@ -118,6 +123,7 @@ h2 {
 #local-counter {
     color: #9AA38B1F;
     font-size: 5em;
+    font-size:clamp(1em,10vw,5em); 
 }
 
 /*踩*/

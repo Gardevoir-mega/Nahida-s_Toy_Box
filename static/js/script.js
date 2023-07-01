@@ -55,11 +55,13 @@ const LANGUAGES = {
 
     // 获取全局计数器元素并初始化其相应的计数。
     const localCounter = document.querySelector('#local-counter');
+    const terminalLogo = document.querySelector('#terminal-logo');
     let localCount = localStorage.getItem('count-nahida') || 0;
     let lastCount = 0;
     let tempCount = 0;
     let akashaTerminalCount = 0;
     let akashaTerminalRun = false;
+    let akashaTerminalOnline = false;
     //初始化计数器
     initCounter();
     // 初始化计时器变量并为计数器按钮元素添加事件监听器。
@@ -79,9 +81,11 @@ const LANGUAGES = {
     for (let i = 2; i <= 7; i++) {
         cacheStaticObj(`img/nahida-${i}.gif`);
     }
-
     // 缓存音频
     getLocalAudioList().forEach((audioUrl) =>{cacheStaticObj(audioUrl)});
+    //缓存连通状态图片
+    cacheStaticObj(`img/terminal-logo-0.webp`);
+    cacheStaticObj(`img/terminal-logo-1.webp`);
     // 缓存对象URL，缓存中存在则返回缓存，如果不存在则获取并缓存它
     function cacheStaticObj(origUrl) {
         if (cachedObjects[origUrl]) {
@@ -124,7 +128,7 @@ const LANGUAGES = {
      */
     function initCounter() {
         // 数字使用美式英语格式，重新格式化计数器
-        localCounter.textContent = localCount.toLocaleString('en-US');
+        localCounter.textContent = Math.floor(localCount).toLocaleString('en-US');
     }
 
     /**
@@ -229,7 +233,7 @@ const LANGUAGES = {
             elem.style.right = "-500px";
             elem.style.top = counterButton.getClientRects()[0].bottom + scrollY - 230 + "px"
             elem.style.zIndex = "-10";
-            elem.style.width = "300px";
+            elem.style.width = "500px";
             elem.style.height = "auto";
             document.body.appendChild(elem);
 
@@ -299,10 +303,21 @@ const LANGUAGES = {
                 akashaTerminalCount = nums.n;
                 tempCount = 0;
                 updateCounter();
+                akashaTerminalOnline = true;
             },
-            complete: function (xhr, textStatus) {
+            error: function () {
+                lastCount+=tempCount;
+                tempCount = 0;
+                akashaTerminalOnline = false;
+            },
+            complete: function () {
                 console.log("time: " + new Date() + " " + (new Date().getTime() - start));
                 akashaTerminalRun = false;
+                if(akashaTerminalOnline){
+                    terminalLogo.src=cacheStaticObj(`img/terminal-logo-1.webp`);
+                }else{
+                    terminalLogo.src=cacheStaticObj(`img/terminal-logo-0.webp`);
+                }
             }
         });
     }
