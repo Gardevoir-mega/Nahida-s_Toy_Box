@@ -5,6 +5,20 @@ const LANGUAGES = {
         audioList: [
             "audio/cn/nana-1.aac",
             "audio/cn/nana-2.aac",
+            "audio/cn/yy/手牵手~.ogg",
+            "audio/cn/yy/全都看见咯。.ogg",
+            "audio/cn/yy/别打啦！.ogg",
+            "audio/cn/yy/变聪明啦~.ogg",
+            "audio/cn/yy/嘿！.ogg",
+            "audio/cn/yy/好痛啊。.ogg",
+            "audio/cn/yy/手牵手~.ogg",
+            "audio/cn/yy/换个策略吧。.ogg",
+            "audio/cn/yy/来我家做客吧~.ogg",
+            "audio/cn/yy/等下有点痛哦.ogg",
+            "audio/cn/yy/蔓延吧。.ogg",
+            "audio/cn/yy/被打晕了….ogg",
+            "audio/cn/yy/记住你了.ogg",
+            "audio/cn/yy/这样不太明智….ogg",
         ],
         texts: {
             "page-title": "欢迎来到纳西妲的「玩具箱」",
@@ -174,8 +188,8 @@ const LANGUAGES = {
         } else {
             audioUrl = getRandomAudioUrl();
         }
-        let audio = new Audio();
-        audio.src = cacheStaticObj(audioUrl);
+        let audio = new Audio(cacheStaticObj(audioUrl));
+        audio.load();
         audio.play();
         audio.addEventListener("ended", function () {
             this.remove();
@@ -268,7 +282,7 @@ const LANGUAGES = {
 
     function fromAkashaTerminal(){
         if(akashaTerminalRun){
-           return; 
+           return;
         }
         const start = new Date().getTime();
         akashaTerminalRun = true;
