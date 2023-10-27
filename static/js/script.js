@@ -100,7 +100,7 @@ const LANGUAGES = {
                 .catch((error) => {
                     console.error(`Error caching object from ${origUrl}: ${error}`);
                 }).finally(() =>upadteProgress());
-            return cachedObjects[origUrl];
+            return finalOrigUrl;
         }
     }
 
