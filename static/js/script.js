@@ -104,11 +104,11 @@ const LANGUAGES = {
             }
         }
         //缓存连通状态图片
-        promises.push(loadImg(`img/terminal-logo-0.webp`).then(result => cachedObjects[origUrl] = result));
-        promises.push(loadImg(`img/terminal-logo-1.webp`).then(result => cachedObjects[origUrl] = result));
+        promises.push(loadImg(`img/terminal-logo-0.webp`).then(result => cachedObjects[`img/terminal-logo-0.webp`] = result));
+        promises.push(loadImg(`img/terminal-logo-1.webp`).then(result => cachedObjects[`img/terminal-logo-1.webp`] = result));
         // 缓存gif
         for (let i = 2; i <= 7; i++) {
-            promises.push(loadImg(`img/nahida-${i}.gif`).then(result => cachedObjects[origUrl] = result));
+            promises.push(loadImg(`img/nahida-${i}.gif`).then(result => cachedObjects[`img/nahida-${i}.gif`] = result));
         }
         progress[1] = promises.length
         await Promise.all(promises);
