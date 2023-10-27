@@ -7,18 +7,11 @@ const LANGUAGES = {
             "audio/cn/nana-2.aac",
             "audio/cn/yy/手牵手~.ogg",
             "audio/cn/yy/全都看见咯。.ogg",
-            "audio/cn/yy/别打啦！.ogg",
             "audio/cn/yy/变聪明啦~.ogg",
             "audio/cn/yy/嘿！.ogg",
-            "audio/cn/yy/好痛啊。.ogg",
             "audio/cn/yy/手牵手~.ogg",
-            "audio/cn/yy/换个策略吧。.ogg",
-            "audio/cn/yy/来我家做客吧~.ogg",
-            "audio/cn/yy/等下有点痛哦.ogg",
             "audio/cn/yy/蔓延吧。.ogg",
-            "audio/cn/yy/被打晕了….ogg",
             "audio/cn/yy/记住你了.ogg",
-            "audio/cn/yy/这样不太明智….ogg",
         ],
         texts: {
             "page-title": "欢迎来到纳西妲的「玩具箱」",
@@ -45,6 +38,7 @@ const LANGUAGES = {
     const $ = mdui.$;
     // 初始化cachedObjects变量以存储缓存的对象URL
     const cachedObjects = {};
+    const progress = [0, 1];
 
     //是否是第一次播放
     let firstNana = true;
@@ -66,26 +60,38 @@ const LANGUAGES = {
     initCounter();
     // 初始化计时器变量并为计数器按钮元素添加事件监听器。
     const counterButton = document.querySelector('#counter-button');
-    counterButton.addEventListener('click', (e) => {
-        localCount++;
-        lastCount++;
-        updateCounter();
-        triggerRipple(e);
-        playNana();
-        animateNahida();
-        refreshDynamicTexts();
-    });
+
+    function addBtnEvent() {
+        counterButton.addEventListener('click', (e) => {
+            localCount++;
+            lastCount++;
+            updateCounter();
+            triggerRipple(e);
+            playNana();
+            animateNahida();
+            refreshDynamicTexts();
+        });
+    }
+
 
     multiLangMutation() // 页面加载时，初始化语言
+    //缓存连通状态图片
+    cacheStaticObj(`img/terminal-logo-0.webp`);
+    cacheStaticObj(`img/terminal-logo-1.webp`);
     // 缓存gif
     for (let i = 2; i <= 7; i++) {
         cacheStaticObj(`img/nahida-${i}.gif`);
     }
     // 缓存音频
-    getLocalAudioList().forEach((audioUrl) =>{cacheStaticObj(audioUrl)});
-    //缓存连通状态图片
-    cacheStaticObj(`img/terminal-logo-0.webp`);
-    cacheStaticObj(`img/terminal-logo-1.webp`);
+    convertAudioFilesToBase64()
+        .catch(error => {
+            console.error(error);
+        })
+        .finally(() => {
+            refreshDynamicTexts();
+            addBtnEvent();
+        });
+
     // 缓存对象URL，缓存中存在则返回缓存，如果不存在则获取并缓存它
     function cacheStaticObj(origUrl) {
         if (cachedObjects[origUrl]) {
@@ -100,12 +106,64 @@ const LANGUAGES = {
                     })
                     .catch((error) => {
                         console.error(`Error caching object from ${origUrl}: ${error}`);
-                    });
+                    }).finally(() =>upadteProgress());
             }, 1);
             return finalOrigUrl;
         }
     }
+    async function convertAudioFilesToBase64() {
+        const dict = LANGUAGES;
+        const promises = [];
+        for (const lang in dict) {
+            if (dict.hasOwnProperty(lang)) {
+                const audioList = dict[lang].audioList;
+                if (Array.isArray(audioList)) {
+                    for (let i = 0; i < audioList.length; i++) {
+                        const url = audioList[i];
+                        if (typeof url === "string" && (url.endsWith(".aac") ||  url.endsWith(".ogg"))) {
+                            promises.push(loadAndEncode("static/" + url).then(result => dict[lang].audioList[i] = result));
+                        }
+                    }
+                }
+            }
+        }
+        progress[1] = promises.length + 8
+        await Promise.all(promises);
+        return dict;
+    }
 
+    function upadteProgress() {
+        progress[0] += 1
+        counterButton.innerText = `${((progress[0] / progress[1]) * 100) | 0}%`
+    }
+
+    function loadAndEncode(url) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.responseType = "arraybuffer";
+            xhr.onload = function () {
+                upadteProgress()
+                if (xhr.status === 200) {
+                    const buffer = xhr.response;
+                    const blob = new Blob([buffer], { type: url.endsWith(".ogg")? "audio/ogg" : "audio/mpeg" });
+                    const reader = new FileReader();
+                    reader.readAsDataURL(blob);
+                    reader.onloadend = function () {
+                        const base64data = reader.result;
+                        resolve(base64data);
+                    }
+                } else {
+                    reject(xhr.statusText);
+                }
+            };
+            xhr.onerror = function () {
+                upadteProgress()
+                reject(xhr.statusText);
+            };
+            xhr.send();
+        });
+    }
     /**
      * 获取指定范围内的随机整数
      * @param {number} min 最小值
@@ -192,7 +250,10 @@ const LANGUAGES = {
         } else {
             audioUrl = getRandomAudioUrl();
         }
-        let audio = new Audio(cacheStaticObj(audioUrl));
+        // let audio = new Audio(cacheStaticObj(audioUrl));
+        // audio.load();
+        let audio = new Audio();
+        audio.src = audioUrl;
         audio.load();
         audio.play();
         audio.addEventListener("ended", function () {
