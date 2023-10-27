@@ -75,15 +75,9 @@ const LANGUAGES = {
 
 
     multiLangMutation() // 页面加载时，初始化语言
-    //缓存连通状态图片
-    cacheStaticObj(`img/terminal-logo-0.webp`);
-    cacheStaticObj(`img/terminal-logo-1.webp`);
-    // 缓存gif
-    for (let i = 2; i <= 7; i++) {
-        cacheStaticObj(`img/nahida-${i}.gif`);
-    }
+
     // 缓存音频
-    convertAudioFilesToBase64()
+    doCache()
         .catch(error => {
             console.error(error);
         })
@@ -93,23 +87,32 @@ const LANGUAGES = {
         });
 
     // 缓存对象URL，缓存中存在则返回缓存，如果不存在则获取并缓存它
-    function cacheStaticObj(origUrl) {
+    async function cacheStaticObj(origUrl) {
         if (cachedObjects[origUrl]) {
             return cachedObjects[origUrl];
         } else {
             const finalOrigUrl = "static/" + origUrl;
-            setTimeout(() => {
-                fetch(finalOrigUrl)
-                    .then((response) => response.blob())
-                    .then((blob) => {
-                        cachedObjects[origUrl] = URL.createObjectURL(blob);
-                    })
-                    .catch((error) => {
-                        console.error(`Error caching object from ${origUrl}: ${error}`);
-                    }).finally(() =>upadteProgress());
-            }, 1);
-            return finalOrigUrl;
+            fetch(finalOrigUrl)
+                .then((response) => response.blob())
+                .then((blob) => {
+                    cachedObjects[origUrl] = URL.createObjectURL(blob);
+                })
+                .catch((error) => {
+                    console.error(`Error caching object from ${origUrl}: ${error}`);
+                }).finally(() =>upadteProgress());
+            return cachedObjects[origUrl];
         }
+    }
+
+    async function doCache(){
+        //缓存连通状态图片
+        await cacheStaticObj(`img/terminal-logo-0.webp`);
+        await cacheStaticObj(`img/terminal-logo-1.webp`);
+        // 缓存gif
+        for (let i = 2; i <= 7; i++) {
+            await cacheStaticObj(`img/nahida-${i}.gif`);
+        }
+        await convertAudioFilesToBase64();
     }
     async function convertAudioFilesToBase64() {
         const dict = LANGUAGES;
