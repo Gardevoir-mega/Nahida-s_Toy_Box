@@ -76,7 +76,7 @@ const LANGUAGES = {
 
     multiLangMutation() // 页面加载时，初始化语言
 
-    // 缓存音频
+    // 缓存对象URL
     doCache()
         .catch(error => {
             console.error(error);
@@ -86,35 +86,8 @@ const LANGUAGES = {
             addBtnEvent();
         });
 
-    // 缓存对象URL，缓存中存在则返回缓存，如果不存在则获取并缓存它
-    async function cacheStaticObj(origUrl) {
-        if (cachedObjects[origUrl]) {
-            return cachedObjects[origUrl];
-        } else {
-            const finalOrigUrl = "static/" + origUrl;
-            fetch(finalOrigUrl)
-                .then((response) => response.blob())
-                .then((blob) => {
-                    cachedObjects[origUrl] = URL.createObjectURL(blob);
-                })
-                .catch((error) => {
-                    console.error(`Error caching object from ${origUrl}: ${error}`);
-                }).finally(() =>upadteProgress());
-            return finalOrigUrl;
-        }
-    }
-
     async function doCache(){
-        //缓存连通状态图片
-        await cacheStaticObj(`img/terminal-logo-0.webp`);
-        await cacheStaticObj(`img/terminal-logo-1.webp`);
-        // 缓存gif
-        for (let i = 2; i <= 7; i++) {
-            await cacheStaticObj(`img/nahida-${i}.gif`);
-        }
-        await convertAudioFilesToBase64();
-    }
-    async function convertAudioFilesToBase64() {
+        // 缓存音频
         const dict = LANGUAGES;
         const promises = [];
         for (const lang in dict) {
@@ -130,9 +103,15 @@ const LANGUAGES = {
                 }
             }
         }
-        progress[1] = promises.length + 8
+        //缓存连通状态图片
+        promises.push(loadImg(`img/terminal-logo-0.webp`).then(result => cachedObjects[origUrl] = result));
+        promises.push(loadImg(`img/terminal-logo-1.webp`).then(result => cachedObjects[origUrl] = result));
+        // 缓存gif
+        for (let i = 2; i <= 7; i++) {
+            promises.push(loadImg(`img/nahida-${i}.gif`).then(result => cachedObjects[origUrl] = result));
+        }
+        progress[1] = promises.length
         await Promise.all(promises);
-        return dict;
     }
 
     function upadteProgress() {
@@ -140,6 +119,28 @@ const LANGUAGES = {
         counterButton.innerText = `${((progress[0] / progress[1]) * 100) | 0}%`
     }
 
+    function loadImg(origUrl) {
+        const finalOrigUrl = "static/" + origUrl;
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", finalOrigUrl, true);
+            xhr.responseType = "arraybuffer";
+            xhr.onload = function () {
+                upadteProgress()
+                if (xhr.status === 200) {
+                    const blob = URL.createObjectURL(xhr.response.blob())
+                    resolve(blob);
+                } else {
+                    reject(xhr.statusText);
+                }
+            };
+            xhr.onerror = function () {
+                upadteProgress()
+                reject(xhr.statusText);
+            };
+            xhr.send();
+        });
+    }
     function loadAndEncode(url) {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
@@ -166,6 +167,13 @@ const LANGUAGES = {
             };
             xhr.send();
         });
+    }
+    function getCacheStaticObj(origUrl) {
+        if (cachedObjects[origUrl]) {
+            return cachedObjects[origUrl];
+        }else {
+            return "static/" + origUrl;
+        }
     }
     /**
      * 获取指定范围内的随机整数
@@ -268,7 +276,7 @@ const LANGUAGES = {
         let id = null;
         const random = randomNum(2,7);
         const elem = document.createElement("img");
-        elem.src = cacheStaticObj(`img/nahida-${random}.gif`);
+        elem.src = getCacheStaticObj(`img/nahida-${random}.gif`);
         const screenWidth = window.innerWidth;
         console.log(screenWidth, (counterButton.getClientRects()[0].bottom + scrollY), isMobile())
         if (isMobile()) {
@@ -378,9 +386,9 @@ const LANGUAGES = {
                 console.log("time: " + new Date() + " " + (new Date().getTime() - start));
                 akashaTerminalRun = false;
                 if(akashaTerminalOnline){
-                    terminalLogo.src=cacheStaticObj(`img/terminal-logo-1.webp`);
+                    terminalLogo.src=getCacheStaticObj(`img/terminal-logo-1.webp`);
                 }else{
-                    terminalLogo.src=cacheStaticObj(`img/terminal-logo-0.webp`);
+                    terminalLogo.src=getCacheStaticObj(`img/terminal-logo-0.webp`);
                 }
             }
         });
