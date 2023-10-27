@@ -128,7 +128,8 @@ const LANGUAGES = {
             xhr.onload = function () {
                 upadteProgress()
                 if (xhr.status === 200) {
-                    const blob = URL.createObjectURL(xhr.response.blob())
+                    const type = xhr.getResponseHeader("Content-Type");
+                    const blob = URL.createObjectURL(new Blob([xhr.response], { type: type }))
                     resolve(blob);
                 } else {
                     reject(xhr.statusText);
