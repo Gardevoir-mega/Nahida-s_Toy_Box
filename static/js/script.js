@@ -5,13 +5,12 @@ const LANGUAGES = {
         audioList: [
             "audio/cn/nana-1.aac",
             "audio/cn/nana-2.aac",
-            "audio/cn/yy/手牵手~.ogg",
-            "audio/cn/yy/全都看见咯。.ogg",
-            "audio/cn/yy/变聪明啦~.ogg",
-            "audio/cn/yy/嘿！.ogg",
-            "audio/cn/yy/手牵手~.ogg",
-            "audio/cn/yy/蔓延吧。.ogg",
-            "audio/cn/yy/记住你了.ogg",
+            "audio/cn/yy-aac/手牵手.aac",
+            "audio/cn/yy-aac/全都看见咯.aac",
+            "audio/cn/yy-aac/变聪明啦.aac",
+            "audio/cn/yy-aac/嘿.aac",
+            "audio/cn/yy-aac/蔓延吧.aac",
+            "audio/cn/yy-aac/记住你了.aac",
         ],
         texts: {
             "page-title": "欢迎来到纳西妲的「玩具箱」",
@@ -53,9 +52,11 @@ const LANGUAGES = {
     let localCount = localStorage.getItem('count-nahida') || 0;
     let lastCount = 0;
     let tempCount = 0;
+    let cacheSuccess = false;
     let akashaTerminalCount = 0;
     let akashaTerminalRun = false;
     let akashaTerminalOnline = false;
+    let akashaTerminalFirst = true;
     //初始化计数器
     initCounter();
     // 初始化计时器变量并为计数器按钮元素添加事件监听器。
@@ -84,6 +85,7 @@ const LANGUAGES = {
         .finally(() => {
             refreshDynamicTexts();
             addBtnEvent();
+            cacheSuccess = true;
         });
 
     async function doCache(){
@@ -357,17 +359,33 @@ const LANGUAGES = {
         });
     }
 
+    function welcome(){
+        akashaTerminalRun = true;
+        $.ajax({method: 'GET', url: 'https://akasha.lv6.fun/terminal/system/welcome', xhrFields: {withCredentials: true},
+            success: function () {akashaTerminalFirst = false;},
+            complete: function () {akashaTerminalRun = false;}});
+    }
     function fromAkashaTerminal(){
         if(akashaTerminalRun){
            return;
         }
+        if(akashaTerminalFirst){
+            welcome();
+        }
+        if(akashaTerminalFirst){
+            return;
+        }
+        loadCount();
+    }
+    function loadCount() {
         const start = new Date().getTime();
         akashaTerminalRun = true;
         tempCount = lastCount;
         lastCount = 0;
         $.ajax({
             method: 'GET',
-            url: 'https://akasha.lv6.fun/terminal/nahida/toy/box/count',
+            url: 'https://akasha.lv6.fun/terminal/nahida/toy/box/c-msg',
+            xhrFields: {withCredentials: true},
             data: {
                 num: tempCount
             },
@@ -378,18 +396,27 @@ const LANGUAGES = {
                 updateCounter();
                 akashaTerminalOnline = true;
             },
-            error: function () {
+            error: function (xhr, textStatus) {
                 lastCount+=tempCount;
                 tempCount = 0;
                 akashaTerminalOnline = false;
+                if(xhr.status === 403){
+                    welcome();
+                }
             },
             complete: function () {
                 console.log("time: " + new Date() + " " + (new Date().getTime() - start));
                 akashaTerminalRun = false;
                 if(akashaTerminalOnline){
-                    terminalLogo.src=getCacheStaticObj(`img/terminal-logo-1.webp`);
+                    const logo = getCacheStaticObj(`img/terminal-logo-1.webp`);
+                    if(terminalLogo.src !== logo){
+                        terminalLogo.src = logo;
+                    }
                 }else{
-                    terminalLogo.src=getCacheStaticObj(`img/terminal-logo-0.webp`);
+                    const logo = getCacheStaticObj(`img/terminal-logo-0.webp`);
+                    if(terminalLogo.src !== logo){
+                        terminalLogo.src = logo;
+                    }
                 }
             }
         });
