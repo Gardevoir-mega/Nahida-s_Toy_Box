@@ -15,7 +15,7 @@ const LANGUAGES = {
         texts: {
             "page-title": "欢迎来到纳西妲的「玩具箱」",
             "doc-title": "Na♪~ Na♪~",
-            "page-descriptions": "给纳西妲酱写的小网站，对，就是那个《原神》中最可爱的尘世七执政！",
+            "page-descriptions": "给纳西妲酱写的小网站，对，就是那个最可爱的尘世七执政！",
             "counter-descriptions": ["纳西妲已经踩了", "纳西妲已经跳了"],
             "counter-unit": ["次~~", "次格子~"],
             "counter-button": ["踩格子", "行相~!"],
@@ -281,7 +281,7 @@ const LANGUAGES = {
         const elem = document.createElement("img");
         elem.src = getCacheStaticObj(`img/nahida-${random}.gif`);
         const screenWidth = window.innerWidth;
-        console.log(screenWidth, (counterButton.getClientRects()[0].bottom + scrollY), isMobile())
+        // console.log(screenWidth, (counterButton.getClientRects()[0].bottom + scrollY), isMobile())
         if (isMobile()) {
             elem.style.position = "absolute";
             elem.style.right = "-200px";
@@ -373,7 +373,6 @@ const LANGUAGES = {
                 if(da.code === 200){
                     if(da.content?.v){
                         at = da.content.v;
-                        console.log(at);
                         localStorage.setItem(k, at);
                     }
                     akashaTerminalFirst = false;
