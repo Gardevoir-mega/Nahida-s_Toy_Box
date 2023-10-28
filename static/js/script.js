@@ -359,10 +359,26 @@ const LANGUAGES = {
         });
     }
 
+    const k = 'akashaTerminal';
+    let at = localStorage.getItem(k) || '';
+    if(at === null || at === '' || at === 'undefined' || at === 'null' || at === undefined){
+        at = '';
+    }
     function welcome(){
         akashaTerminalRun = true;
-        $.ajax({method: 'GET', url: 'https://akasha.lv6.fun/terminal/system/welcome', xhrFields: {withCredentials: true},
-            success: function () {akashaTerminalFirst = false;},
+        $.ajax({method: 'POST', url: 'https://akasha.lv6.fun/terminal/system/welcome',
+            data:{akashaTerminal: at,device: 'mobile'},
+            success: function (data, textStatus, xhr) {
+                const da = JSON.parse(data);
+                if(da.code === 200){
+                    if(da.content?.v){
+                        at = da.content.v;
+                        console.log(at);
+                        localStorage.setItem(k, at);
+                    }
+                    akashaTerminalFirst = false;
+                }
+            },
             complete: function () {akashaTerminalRun = false;}});
     }
     function fromAkashaTerminal(){
@@ -383,12 +399,9 @@ const LANGUAGES = {
         tempCount = lastCount;
         lastCount = 0;
         $.ajax({
-            method: 'GET',
+            method: 'POST',
             url: 'https://akasha.lv6.fun/terminal/nahida/toy/box/c-msg',
-            xhrFields: {withCredentials: true},
-            data: {
-                num: tempCount
-            },
+            data: {num: tempCount, akashaTerminal: at, device: 'mobile'},
             success: function (data) {
                 const nums = JSON.parse(data);
                 akashaTerminalCount = nums.n;
