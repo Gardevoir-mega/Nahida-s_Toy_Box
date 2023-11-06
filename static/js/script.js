@@ -50,13 +50,18 @@ const LANGUAGES = {
     const localCounter = document.querySelector('#local-counter');
     const terminalLogo = document.querySelector('#terminal-logo');
     let localCount = localStorage.getItem('count-nahida') || 0;
+    const k = 'akashaTerminal';
+    let at = localStorage.getItem(k) || '';
+    if(at === null || at === undefined || at === '' || at === 'undefined' || at === 'null'){
+        at = '';
+    }
     let lastCount = 0;
     let tempCount = 0;
     let cacheSuccess = false;
     let akashaTerminalCount = 0;
     let akashaTerminalRun = false;
     let akashaTerminalOnline = false;
-    let akashaTerminalFirst = true;
+    let akashaTerminalFirst = at === '';
     //初始化计数器
     initCounter();
     // 初始化计时器变量并为计数器按钮元素添加事件监听器。
@@ -359,14 +364,9 @@ const LANGUAGES = {
         });
     }
 
-    const k = 'akashaTerminal';
-    let at = localStorage.getItem(k) || '';
-    if(at === null || at === '' || at === 'undefined' || at === 'null' || at === undefined){
-        at = '';
-    }
     function welcome(){
         akashaTerminalRun = true;
-        $.ajax({method: 'POST', url: 'https://akasha.lv6.fun/terminal/system/welcome',
+        return $.ajax({method: 'POST', url: 'https://akasha.lv6.fun/terminal/system/welcome',
             data:{akashaTerminal: at,device: 'mobile'},
             success: function (data, textStatus, xhr) {
                 const da = JSON.parse(data);
@@ -381,23 +381,23 @@ const LANGUAGES = {
             complete: function () {akashaTerminalRun = false;}});
     }
     function fromAkashaTerminal(){
+        const start = new Date().getTime();
         if(akashaTerminalRun){
            return;
         }
         if(akashaTerminalFirst){
-            welcome();
+            welcome().then(() => {
+                return loadCount();
+            }).then(() => console.log("time: " + new Date() + " " + (new Date().getTime() - start)));
+        }else {
+            loadCount().then(() => console.log("time: " + new Date() + " " + (new Date().getTime() - start)));
         }
-        if(akashaTerminalFirst){
-            return;
-        }
-        loadCount();
     }
     function loadCount() {
-        const start = new Date().getTime();
         akashaTerminalRun = true;
         tempCount = lastCount;
         lastCount = 0;
-        $.ajax({
+        return $.ajax({
             method: 'POST',
             url: 'https://akasha.lv6.fun/terminal/nahida/toy/box/c-msg',
             data: {num: tempCount, akashaTerminal: at, device: 'mobile'},
@@ -417,7 +417,6 @@ const LANGUAGES = {
                 }
             },
             complete: function () {
-                console.log("time: " + new Date() + " " + (new Date().getTime() - start));
                 akashaTerminalRun = false;
                 if(akashaTerminalOnline){
                     const logo = getCacheStaticObj(`img/terminal-logo-1.webp`);
@@ -438,6 +437,7 @@ const LANGUAGES = {
         setInterval(() => {
             localStorage.setItem('count-nahida', localCount);
         }, 500);
+        fromAkashaTerminal();
         setInterval(() => {
             fromAkashaTerminal();
         }, 5000);
